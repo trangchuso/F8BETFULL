@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function() {
     ======================================================== */
     const redirectUrl = "https://m.f8bet11g.com/";
     // DÁN LINK WEB APP URL CỦA BẠN VÀO DƯỚI ĐÂY:
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwLY5sTFvl3KMIhud6UDpqpwq9JWe7tSSV12_eWF2mXJmal-t5kGbYaFbqz90J9j2_l/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyZ57pz2Iv658JMnPe1tzEzMLaY9UZBd8s4HDaICG-HQWtBFq48Pnyi4ofjHEAEsQ/exec";
 
     // Hàm gửi dữ liệu lên Google Sheet
     function sendDataToSheet(data, submitButton) {
