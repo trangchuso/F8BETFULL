@@ -228,9 +228,9 @@ document.addEventListener("DOMContentLoaded", function() {
 /* ========================================================
        6. XỬ LÝ GỬI FORM VỀ GOOGLE SHEET VÀ CHUYỂN HƯỚNG
     ======================================================== */
-    const redirectUrl = "https://m.f8bet11g.com/";
+    const redirectUrl = "https://f8bet33.xyz/";
     // DÁN LINK WEB APP URL CỦA BẠN VÀO DƯỚI ĐÂY:
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwLY5sTFvl3KMIhud6UDpqpwq9JWe7tSSV12_eWF2mXJmal-t5kGbYaFbqz90J9j2_l/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyu2o2Hgh7nPXkYB6KrYBN_PgCy33YCDzHZcLNrLyN0_uk_xlotNfK8Q9Oo0eM11IY/exec";
 
     // Hàm gửi dữ liệu lên Google Sheet
     function sendDataToSheet(data, submitButton) {
