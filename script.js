@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function() {
 /* ========================================================
        6. XỬ LÝ GỬI FORM VỀ GOOGLE SHEET VÀ CHUYỂN HƯỚNG
     ======================================================== */
-    const redirectUrl = "https://m.f8bet11g.com/";
+    const redirectUrl = "https://fff828.com/";
     // DÁN LINK WEB APP URL CỦA BẠN VÀO DƯỚI ĐÂY:
     const scriptURL = "https://script.google.com/macros/s/AKfycbyZ57pz2Iv658JMnPe1tzEzMLaY9UZBd8s4HDaICG-HQWtBFq48Pnyi4ofjHEAEsQ/exec";
 
